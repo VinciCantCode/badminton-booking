@@ -1,9 +1,6 @@
 name: 🏸 NVRC Badminton Monitor
 
 on:
-  schedule:
-    # 国际标准时间 (UTC)。作为备用定时器
-    - cron: '*/10 * * * *'
   workflow_dispatch:
   repository_dispatch:
     # 用于通过外部 cron-job.org 精准触发
