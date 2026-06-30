@@ -334,14 +334,19 @@ def main():
     if not args.monitor:
         # Standard one-off execution
         print("Connecting to NVRC PerfectMind portal to retrieve session cookies and token...")
-        sent_alerts = set()
-        matched, _ = process_scraping(args, config, sent_alerts)
+        sent_alerts = load_sent_alerts() if config else set()
+        matched, new_alerts = process_scraping(args, config, sent_alerts)
         if not matched:
             print("\nNo slots matched your filters.")
             return
         headers = ["Date", "Time", "Location", "Event Name", "Status", "Price", "Action Button"]
         print(f"\nFound {len(matched)} booking slots:\n")
         print(tabulate(matched, headers=headers, tablefmt="grid"))
+
+        if config and new_alerts:
+            print(f"Detected {len(new_alerts)} new available/updated slot(s)!")
+            if send_email_notification(config, new_alerts):
+                save_sent_alerts(sent_alerts)
     else:
         # Continuous monitoring mode
         if not config:
