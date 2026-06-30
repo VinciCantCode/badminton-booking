@@ -83,6 +83,12 @@ jobs:
           git config --local user.name "GitHub Actions"
           if [ -f "sent_alerts.json" ]; then
             git add sent_alerts.json
-            git commit -m "Update sent alerts history [skip ci]" || exit 0
-            git push
+            # 仅在 sent_alerts.json 确实有变动时才进行提交和推送，避免空提交报错
+            if ! git diff-index --quiet HEAD --; then
+              git commit -m "Update sent alerts history [skip ci]"
+              git pull --rebase origin main
+              git push
+            else
+              echo "No changes to alert history. Skipping push."
+            fi
           fi
