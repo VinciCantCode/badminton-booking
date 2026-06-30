@@ -82,7 +82,7 @@ jobs:
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           if [ -f "sent_alerts.json" ]; then
-            git add sent_alerts.json
+            git add -f sent_alerts.json
             # 仅在 sent_alerts.json 确实有变动时才进行提交和推送，避免空提交报错
             if ! git diff-index --quiet HEAD --; then
               git commit -m "Update sent alerts history [skip ci]"
