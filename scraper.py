@@ -281,8 +281,14 @@ def process_scraping(args, config, sent_alerts):
             continue
 
         # 3. Location filter
-        if args.location and args.location.lower() not in location.lower():
-            continue
+        if args.location:
+            matched_loc = False
+            for loc_filter in args.location:
+                if loc_filter.lower() in location.lower():
+                    matched_loc = True
+                    break
+            if not matched_loc:
+                continue
 
         # 4. Available filter
         if args.available and spots in ["Full", "FULL - Waitlist Available"]:
@@ -322,7 +328,7 @@ def process_scraping(args, config, sent_alerts):
 
 def main():
     parser = argparse.ArgumentParser(description="NVRC Badminton Court Booking Scraper & Monitor")
-    parser.add_argument("-l", "--location", help="Filter by location (e.g. Delbrook, Lions Gate, Parkgate, JBCC, Lynn Creek)")
+    parser.add_argument("-l", "--location", nargs="+", help="Filter by locations (space separated, e.g., Delbrook JBCC)")
     parser.add_argument("-d", "--days", nargs="+", help="Filter by day of week (e.g. Tuesday Thursday)")
     parser.add_argument("-a", "--available", action="store_true", help="Only show available slots (i.e. not Full)")
     parser.add_argument("-s", "--my-schedule", action="store_true", help="Filter by personal schedule (Workdays M-F after 6:00 PM, Weekends Sat-Sun anytime)")
