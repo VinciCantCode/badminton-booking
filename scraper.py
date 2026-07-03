@@ -2,6 +2,7 @@
 import argparse
 import re
 import sys
+from datetime import datetime
 import requests
 import json
 import time
@@ -236,6 +237,23 @@ def is_after_6pm(time_str):
 
     return hour >= 18
 
+def is_past_slot(date_desc, start_time_str):
+    """Checks if a slot's date and start time have already passed relative to local time."""
+    try:
+        # Clean the ordinal suffixes (st, nd, rd, th) from date_desc (e.g. 'Thu, Jul 2nd, 2026' -> 'Thu, Jul 2, 2026')
+        cleaned_date = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', date_desc)
+        # Extract the date part (after the first comma)
+        if ',' in cleaned_date:
+            date_part = cleaned_date.split(',', 1)[1].strip()
+        else:
+            date_part = cleaned_date.strip()
+            
+        datetime_str = f"{date_part} {start_time_str}"
+        slot_datetime = datetime.strptime(datetime_str, "%b %d, %Y %I:%M %p")
+        return slot_datetime < datetime.now()
+    except Exception:
+        return False
+
 def process_scraping(args, config, sent_alerts):
     """Runs a single scraping cycle, parses filters, and detects new slots."""
     session = requests.Session()
@@ -257,6 +275,7 @@ def process_scraping(args, config, sent_alerts):
         event_name = c.get("EventName", "")
         time_desc = c.get("EventTimeDescription", "")
         date_desc = c.get("FormattedStartDate", "")
+        formatted_start_time = c.get("FormattedStartTime", "")
         spots = c.get("Spots", "").strip()
         price = c.get("PriceRange", "")
         button_text = c.get("BookButtonText", "")
@@ -271,6 +290,11 @@ def process_scraping(args, config, sent_alerts):
             status = "Available (Click More Info / Book)"
         else:
             status = f"Available ({spots})"
+
+        # 0. Skip slots that have already started (are in the past)
+        if formatted_start_time and date_desc:
+            if is_past_slot(date_desc, formatted_start_time):
+                continue
 
         # 1. Skip slots that are not yet open for registration (button is "More Info" and spots is empty)
         if button_text == "More Info" and not spots:
@@ -308,7 +332,6 @@ def process_scraping(args, config, sent_alerts):
 
         # 6. Personal schedule filter
         if args.my_schedule:
-            formatted_start_time = c.get("FormattedStartTime", "")
             is_weekday = day_of_week in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
             if is_weekday and not is_after_6pm(formatted_start_time):
                 continue
