@@ -9,54 +9,54 @@ on:
         description: 'Delbrook Community Recreation Centre'
         type: boolean
         required: true
-        default: false
+        default: true
       loc_jbcc:
         description: 'John Braithwaite Community Centre (JBCC)'
         type: boolean
         required: true
-        default: false
+        default: true
       loc_lions_gate:
         description: 'Lions Gate Community Recreation Centre'
         type: boolean
         required: true
-        default: false
+        default: true
       loc_lynn_creek:
         description: 'Lynn Creek Community Recreation Centre'
         type: boolean
         required: true
-        default: false
+        default: true
       loc_parkgate:
         description: 'Parkgate Community Centre'
         type: boolean
         required: true
-        default: false
+        default: true
 
       # 星期几多选
       day_monday:
         description: 'Monday (周一)'
         type: boolean
         required: true
-        default: false
+        default: true
       day_tuesday:
         description: 'Tuesday (周二)'
         type: boolean
         required: true
-        default: false
+        default: true
       day_wednesday:
         description: 'Wednesday (周三)'
         type: boolean
         required: true
-        default: false
+        default: true
       day_thursday:
         description: 'Thursday (周四)'
         type: boolean
         required: true
-        default: false
+        default: true
       day_friday:
         description: 'Friday (周五)'
         type: boolean
         required: true
-        default: false
+        default: true
       day_saturday:
         description: 'Saturday (周六)'
         type: boolean
